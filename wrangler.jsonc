@@ -1,0 +1,24 @@
+{
+	"name": "alphabet-game",
+	"main": "build/index.js",
+	"compatibility_date": "2025-11-08",
+  "compatibility_flags": [
+    "global_fetch_strictly_public"
+  ],
+  "observability": {
+    "enabled": true
+  },
+	"build": {
+		"command": "cargo leptos build --release && cargo install -q worker-build && LEPTOS_OUTPUT_NAME=alphabet-game worker-build --release --features ssr"
+	},
+	"assets": {
+		"directory": "./target/site"
+	},
+	"d1_databases": [
+		{
+			"binding": "alphabet_game_stg",
+			"database_name": "alphabet-game-stg",
+			"database_id": "0f14c246-f56e-442d-a61f-c21b091b2f9d"
+		}
+	]
+}
