@@ -27,3 +27,9 @@ d1-remote-query *args:
 
 d1-remote-migration-apply:
   npx wrangler d1 migrations apply --remote alphabet-game-stg
+
+_claude *args:
+    claude {{ args }}
+
+claude *args:
+    just -E .env-claude _claude {{ args }}

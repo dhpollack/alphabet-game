@@ -6,7 +6,7 @@ use leptos_router::{
 };
 
 use crate::components::languages_d1::ShowLanguagesFromD1;
-use crate::components::show_data_from_api::ShowDataFromApi;
+use crate::components::game::AlphabetGame;
 
 pub fn shell(options: LeptosOptions) -> impl IntoView {
     view! {
@@ -52,8 +52,7 @@ pub fn App() -> impl IntoView {
 #[component]
 fn HomePage() -> impl IntoView {
     view! {
-        <h1>"Hello world!"</h1>
-        <ShowDataFromApi />
+        <AlphabetGame />
     }
 }
 
