@@ -1,1 +1,2 @@
 -- Migration number: 0001 	 2025-11-09T14:38:47.665Z
+CREATE TABLE IF NOT EXISTS Languages (id INTEGER PRIMARY KEY, name TEXT NOT NULL, name_other TEXT, code TEXT NOT NULL);

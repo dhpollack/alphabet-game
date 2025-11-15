@@ -1,17 +1,23 @@
 help:
   just -l -u
 
-dev:
+dev: sqlx-prepare
   npx wrangler dev
 
-deploy:
+deploy: sqlx-prepare
   npx wrangler deploy
 
-d1-local-populate:
-  npx wrangler d1 execute alphabet-game-stg --local --file=./sql/schema.sql
+sqlx-prepare:
+  cargo sqlx prepare -- --features ssr
+
+d1-migration-create *args:
+  npx wrangler d1 migrations create alphabet-game-stg "{{ args }}"
 
 d1-local-query *args:
   npx wrangler d1 execute alphabet-game-stg --local --command="{{ args }}"
+
+d1-local-migration-apply:
+  npx wrangler d1 migrations apply alphabet-game-stg
 
 d1-remote-populate:
   npx wrangler d1 execute alphabet-game-stg --remote --file=./sql/schema.sql
@@ -19,3 +25,5 @@ d1-remote-populate:
 d1-remote-query *args:
   npx wrangler d1 execute alphabet-game-stg --remote --command="{{ args }}"
 
+d1-remote-migration-apply:
+  npx wrangler d1 migrations apply --remote alphabet-game-stg
