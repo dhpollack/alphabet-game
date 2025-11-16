@@ -1,3 +1,4 @@
+use crate::components::language_selector::LanguageSelector;
 use crate::game::GameContext;
 use leptos::prelude::*;
 
@@ -18,10 +19,7 @@ pub fn GameHeader() -> impl IntoView {
                 <button class="text-xl hover:bg-teal-600 p-2 rounded">
                     ?
                 </button>
-                <!-- "Select Language Component" -->
-                <div class="flex items-center space-x-2">
-                    <span class="text-xl">US</span>
-                </div>
+                <LanguageSelector />
             </div>
 
             // Center Section: Current Word and User Input
