@@ -8,14 +8,14 @@ pub fn LetterGrid() -> impl IntoView {
     let state = game_context.state;
 
     view! {
-        <div class="bg-amber-800 min-h-screen p-4">
-            <div class="max-w-md mx-auto">
+        <div class="bg-yellow-200 flex-grow">
+            <div class="w-full h-full">
                 <Suspense fallback=move || view! { <p class="text-white text-center">"Loading..."</p> }>
                     { move || {
                         let game_letters = state.with(|s| s.game_letters.clone());
 
                         view! {
-                            <div class="grid grid-cols-4 gap-4">
+                            <div class="grid grid-cols-3 landscape:grid-cols-4 h-full">
                                 {game_letters.into_iter().map(|letter| {
                                     let game_context_clone = game_context.clone();
                                     let letter_clone = letter.clone();

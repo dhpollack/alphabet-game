@@ -11,21 +11,31 @@ pub fn GameHeader() -> impl IntoView {
     view! {
         <header class="bg-teal-700 text-white p-4 flex items-center justify-between">
             // Left Section: Score, Help, Language
-            <div class="flex items-center space-x-4">
-                <div class="flex items-center space-x-2">
-                    <span class="text-yellow-400">&starf;</span>
-                    <span>{move || state.get().score}</span>
+            <div class="flex items-start space-x-4">
+                <div class="flex space-x-2">
+                    <img src="/icons/star.svg" alt="Score" class="object-fill" />
+                    <span class="text-[2vw]">{move || state.get().score}</span>
                 </div>
-                <button class="text-xl hover:bg-teal-600 p-2 rounded">
-                    ?
-                </button>
-                <LanguageSelector />
             </div>
 
             // Center Section: Current Word and User Input
             <div class="flex flex-col items-center">
-                <div class="text-xl font-bold underline">
-                    {move || state.get().current_word}
+                <div class="flex items-center space-x-3">
+                    <button
+                        on:click=move |_| { game_context.remove_last_letter(); }
+                        class="bg-red-500 text-white p-1 rounded hover:bg-red-600 active:bg-red-700 transition-colors"
+                    >
+                        <img src="/icons/backspace.svg" alt="Backspace" class="w-6 h-6" />
+                    </button>
+                    <div class="text-xl font-bold underline">
+                        {move || state.get().current_word}
+                    </div>
+                    <button
+                        on:click=move |_| { game_context_clone.check_spelling(); }
+                        class="bg-green-500 text-white p-1 rounded hover:bg-green-600 active:bg-green-700 transition-colors"
+                    >
+                        <img src="/icons/check.svg" alt="Check" class="w-6 h-6" />
+                    </button>
                 </div>
                 <div class="text-lg mt-1 min-h-6">
                     {move || state.get().user_input}
@@ -33,29 +43,21 @@ pub fn GameHeader() -> impl IntoView {
             </div>
 
             // Right Section: Menu, Control Buttons, and Alphabet
-            <div class="flex items-center space-x-4">
+            <div class="flex items-start space-x-4">
                 <div class="flex flex-col items-end space-y-2">
                     <div class="flex space-x-2">
-                        <button
-                            on:click=move |_| { game_context.remove_last_letter(); }
-                            class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 active:bg-red-700 transition-colors"
-                        >
-                            backspace
+                        <button class="text-xl hover:bg-teal-600 p-2 rounded">
+                            <img src="/icons/menu.svg" alt="Menu" class="w-6 h-6" />
                         </button>
-                        <button
-                            on:click=move |_| { game_context_clone.check_spelling(); }
-                            class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600 active:bg-green-700 transition-colors"
-                        >
-                            check
+                        <button class="text-xl hover:bg-teal-600 p-2 rounded">
+                            <img src="/icons/alphabet.svg" alt="Alphabet" class="w-6 h-6" />
                         </button>
                     </div>
                     <div class="flex space-x-2">
                         <button class="text-xl hover:bg-teal-600 p-2 rounded">
-                            burger-menu
+                            <img src="/icons/help.svg" alt="Help" class="w-6 h-6" />
                         </button>
-                        <button class="text-xl hover:bg-teal-600 p-2 rounded">
-                            <span class="underline">A</span>
-                        </button>
+                        <LanguageSelector />
                     </div>
                 </div>
             </div>
