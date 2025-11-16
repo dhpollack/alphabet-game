@@ -6,7 +6,6 @@ use leptos_router::{
 };
 
 use crate::components::game::AlphabetGame;
-use crate::components::languages_d1::ShowLanguagesFromD1;
 
 pub fn shell(options: LeptosOptions) -> impl IntoView {
     view! {
@@ -41,7 +40,6 @@ pub fn App() -> impl IntoView {
             <main>
                 <Routes fallback=|| "Page not found.".into_view()>
                     <Route path=path!("/") view=HomePage/>
-                    <Route path=path!("/languages") view=Languages/>
                 </Routes>
             </main>
         </Router>
@@ -53,14 +51,5 @@ pub fn App() -> impl IntoView {
 fn HomePage() -> impl IntoView {
     view! {
         <AlphabetGame />
-    }
-}
-
-/// Page for showing languages
-#[component]
-fn Languages() -> impl IntoView {
-    view! {
-        <h1>"Languages"</h1>
-        <ShowLanguagesFromD1 />
     }
 }

@@ -19,9 +19,6 @@ d1-local-query *args:
 d1-local-migration-apply:
   npx wrangler d1 migrations apply alphabet-game-stg
 
-d1-remote-populate:
-  npx wrangler d1 execute alphabet-game-stg --remote --file=./sql/schema.sql
-
 d1-remote-query *args:
   npx wrangler d1 execute alphabet-game-stg --remote --command="{{ args }}"
 
