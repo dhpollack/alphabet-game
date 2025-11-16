@@ -5,8 +5,8 @@ use leptos_router::{
     path,
 };
 
-use crate::components::languages_d1::ShowLanguagesFromD1;
 use crate::components::game::AlphabetGame;
+use crate::components::languages_d1::ShowLanguagesFromD1;
 
 pub fn shell(options: LeptosOptions) -> impl IntoView {
     view! {

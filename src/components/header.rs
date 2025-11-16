@@ -1,5 +1,5 @@
-use leptos::prelude::*;
 use crate::game::GameContext;
+use leptos::prelude::*;
 
 #[component]
 pub fn GameHeader() -> impl IntoView {
@@ -18,6 +18,7 @@ pub fn GameHeader() -> impl IntoView {
                 <button class="text-xl hover:bg-teal-600 p-2 rounded">
                     ?
                 </button>
+                <!-- "Select Language Component" -->
                 <div class="flex items-center space-x-2">
                     <span class="text-xl">US</span>
                 </div>
@@ -41,18 +42,18 @@ pub fn GameHeader() -> impl IntoView {
                             on:click=move |_| { game_context.remove_last_letter(); }
                             class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 active:bg-red-700 transition-colors"
                         >
-                            &larr;
+                            backspace
                         </button>
                         <button
                             on:click=move |_| { game_context_clone.check_spelling(); }
                             class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600 active:bg-green-700 transition-colors"
                         >
-                            &check;
+                            check
                         </button>
                     </div>
                     <div class="flex space-x-2">
                         <button class="text-xl hover:bg-teal-600 p-2 rounded">
-                            &#9776;
+                            burger-menu
                         </button>
                         <button class="text-xl hover:bg-teal-600 p-2 rounded">
                             <span class="underline">A</span>

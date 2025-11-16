@@ -1,5 +1,11 @@
+use std::collections::HashSet;
+
 use leptos::prelude::*;
+use rand::seq::SliceRandom;
 use serde::{Deserialize, Serialize};
+
+const GAME_GRID_SIZE: usize = 12;
+const DEFAULT_LANGUAGE_ID: u32 = 1;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GameState {
@@ -11,6 +17,9 @@ pub struct GameState {
     pub current_attempt: i32,
     pub is_completed: bool,
     pub language_id: u32,
+    pub language_letters: Vec<String>,
+    pub game_letters: Vec<String>,
+    pub game_grid_size: usize,
 }
 
 impl Default for GameState {
@@ -23,15 +32,17 @@ impl Default for GameState {
             max_attempts: 5,
             current_attempt: 1,
             is_completed: false,
-            language_id: 1, // Default language ID
+            language_id: DEFAULT_LANGUAGE_ID, // Default language ID
+            language_letters: vec![],
+            game_letters: vec![],
+            game_grid_size: GAME_GRID_SIZE,
         }
     }
 }
 
 impl GameState {
-    pub fn new(word: String, language_id: u32) -> Self {
+    pub fn new(language_id: u32) -> Self {
         Self {
-            current_word: word,
             language_id,
             ..Default::default()
         }
@@ -70,13 +81,35 @@ impl GameState {
         is_correct
     }
 
-    pub fn reset_for_next_word(&mut self, next_word: String, language_id: u32) {
+    pub fn reset_for_next_word(&mut self, next_word: String) {
+        let alphabet_letters = self.language_letters.clone();
+        let grid_size = self.game_grid_size;
+        let mut grid_letters: HashSet<String> = next_word.chars().map(|c| c.to_string()).collect();
+        let mut rng = rand::rng();
+        let mut distractor_letters: Vec<String> = alphabet_letters
+            .into_iter()
+            .filter(|l| !grid_letters.contains(l))
+            .collect();
+        distractor_letters.shuffle(&mut rng);
+        let needed = grid_size.saturating_sub(grid_letters.len());
+        grid_letters.extend(distractor_letters.into_iter().take(needed));
+        let mut final_grid: Vec<String> = grid_letters.into_iter().collect();
+        final_grid.shuffle(&mut rng);
+
         self.current_word = next_word;
         self.user_input.clear();
         self.attempts = 0;
         self.current_attempt = 1;
         self.is_completed = false;
-        self.language_id = language_id;
+        self.game_letters = final_grid;
+    }
+
+    pub fn set_language_letters(&mut self, letters: Vec<String>) {
+        self.language_letters = letters;
+    }
+
+    pub fn set_game_letters(&mut self, letters: Vec<String>) {
+        self.game_letters = letters;
     }
 }
 
@@ -86,12 +119,18 @@ pub struct GameContext {
     pub current_language: RwSignal<u32>,
 }
 
-impl GameContext {
-    pub fn new() -> Self {
+impl Default for GameContext {
+    fn default() -> Self {
         Self {
             state: RwSignal::new(GameState::default()),
             current_language: RwSignal::new(1), // Default language ID
         }
+    }
+}
+
+impl GameContext {
+    pub fn new() -> Self {
+        Self::default()
     }
 
     pub fn add_letter(&self, letter: &str) {
@@ -114,22 +153,30 @@ impl GameContext {
         result
     }
 
-    pub fn set_current_word(&self, word: String, language_id: u32) {
+    pub fn set_language_id(&self, language_id: u32) {
         self.state.update(|state| {
-            state.current_word = word;
             state.language_id = language_id;
-            state.user_input.clear();
-            state.attempts = 0;
-            state.current_attempt = 1;
-            state.is_completed = false;
         });
         self.current_language.set(language_id);
     }
 
-    pub fn reset_for_next_word(&self, next_word: String, language_id: u32) {
+    pub fn reset_for_next_word(&self, next_word: String) {
         self.state.update(|state| {
-            state.reset_for_next_word(next_word, language_id);
+            state.reset_for_next_word(next_word);
         });
-        self.current_language.set(language_id);
+    }
+
+    pub fn set_language_letters(&self, letters: Vec<String>) {
+        self.state.update(|state| {
+            state.set_language_letters(letters);
+        });
+    }
+
+    pub fn get_current_word(&self) -> String {
+        self.state.get().current_word.clone()
+    }
+
+    pub fn get_language_id(&self) -> u32 {
+        self.state.get().language_id
     }
 }

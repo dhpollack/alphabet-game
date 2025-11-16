@@ -1,7 +1,8 @@
 use leptos::prelude::*;
-use crate::game::GameContext;
-use crate::database::get_random_word_for_language;
+
 use crate::components::{header::GameHeader, letter_grid::LetterGrid};
+use crate::database::{get_letters_for_language, get_random_word_for_language};
+use crate::game::GameContext;
 
 #[component]
 pub fn AlphabetGame() -> impl IntoView {
@@ -14,9 +15,24 @@ pub fn AlphabetGame() -> impl IntoView {
         move || {
             let game_context = game_context.clone();
             leptos::task::spawn_local(async move {
-                match get_random_word_for_language(1).await {
+                let current_language = game_context.get_language_id();
+                match get_letters_for_language(current_language).await {
+                    Ok(letters_res) if !letters_res.is_empty() => {
+                        let alphabet_letters: Vec<String> =
+                            letters_res.into_iter().map(|l| l.letter).collect();
+                        // set alphabet letters
+                        game_context.set_language_letters(alphabet_letters.clone());
+                    }
+                    Ok(_) => leptos::logging::log!(
+                        "Returned empty vec of letters for {current_language}"
+                    ),
+                    Err(e) => {
+                        leptos::logging::log!("No letters found for this language: {:?}", e);
+                    }
+                };
+                match get_random_word_for_language(current_language).await {
                     Ok(Some(word)) => {
-                        game_context.set_current_word(word.word, word.language_id);
+                        game_context.reset_for_next_word(word.word);
                     }
                     Ok(None) => {
                         leptos::logging::log!("No words found in database");
@@ -24,7 +40,7 @@ pub fn AlphabetGame() -> impl IntoView {
                     Err(e) => {
                         leptos::logging::log!("Error loading word: {:?}", e);
                     }
-                }
+                };
             });
         }
     });
@@ -40,7 +56,7 @@ pub fn AlphabetGame() -> impl IntoView {
                 leptos::task::spawn_local(async move {
                     match get_random_word_for_language(state.language_id).await {
                         Ok(Some(word)) => {
-                            game_context.reset_for_next_word(word.word, word.language_id);
+                            game_context.reset_for_next_word(word.word);
                         }
                         Ok(None) => {
                             leptos::logging::log!("No more words found");
@@ -49,6 +65,46 @@ pub fn AlphabetGame() -> impl IntoView {
                             leptos::logging::log!("Error loading next word: {:?}", e);
                         }
                     }
+                });
+            }
+        }
+    });
+
+    // Handle language change
+    Effect::new({
+        let game_context = game_context.clone();
+        move || {
+            let state = game_context.state.get();
+            let current_language = game_context.current_language.get();
+            if state.language_id != current_language {
+                let game_context = game_context.clone();
+                leptos::task::spawn_local(async move {
+                    game_context.set_language_id(current_language);
+                    match get_letters_for_language(current_language).await {
+                        Ok(letters_res) if !letters_res.is_empty() => {
+                            let alphabet_letters: Vec<String> =
+                                letters_res.into_iter().map(|l| l.letter).collect();
+                            // set alphabet letters
+                            game_context.set_language_letters(alphabet_letters.clone());
+                        }
+                        Ok(_) => leptos::logging::log!(
+                            "Returned empty vec of letters for {current_language}"
+                        ),
+                        Err(e) => {
+                            leptos::logging::log!("No letters found for this language: {:?}", e);
+                        }
+                    };
+                    match get_random_word_for_language(current_language).await {
+                        Ok(Some(word)) => {
+                            game_context.reset_for_next_word(word.word);
+                        }
+                        Ok(None) => {
+                            leptos::logging::log!("No words found in database");
+                        }
+                        Err(e) => {
+                            leptos::logging::log!("Error loading word: {:?}", e);
+                        }
+                    };
                 });
             }
         }

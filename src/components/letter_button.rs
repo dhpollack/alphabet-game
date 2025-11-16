@@ -1,10 +1,7 @@
 use leptos::prelude::*;
 
 #[component]
-pub fn LetterButton(
-    letter: String,
-    on_click: impl Fn() + 'static,
-) -> impl IntoView {
+pub fn LetterButton(letter: String, on_click: impl Fn() + 'static) -> impl IntoView {
     view! {
         <button
             on:click=move |_| on_click()
