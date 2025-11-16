@@ -1,2 +1,5 @@
-pub mod show_data_from_api;
-pub mod languages_d1;
+pub mod game;
+pub mod header;
+pub mod language_selector;
+pub mod letter_button;
+pub mod letter_grid;

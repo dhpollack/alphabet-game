@@ -5,14 +5,18 @@ use crate::app::*;
 
 pub mod app;
 mod components;
+pub mod database;
+pub mod game;
 
 #[cfg(feature = "ssr")]
 pub fn register_server_functions() {
     use leptos::server_fn::axum::register_explicit;
 
     // Add all of your server functions here
-    register_explicit::<components::show_data_from_api::SayHello>();
-    register_explicit::<components::languages_d1::ShowLanguages>();
+    register_explicit::<database::GetLanguages>();
+    register_explicit::<database::GetLettersForLanguage>();
+    register_explicit::<database::GetWordsForLanguage>();
+    register_explicit::<database::GetRandomWordForLanguage>();
 }
 
 #[cfg(feature = "ssr")]
