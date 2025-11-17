@@ -6,3 +6,4 @@ build
 # custom
 legacy/
 .env*
+screenshots/

@@ -6,6 +6,8 @@ A multilingual educational game built with Rust, Leptos, and Cloudflare Workers 
 
 Play the game at: **https://alphabet-game.david-44a.workers.dev/**
 
+See code at: https://github.com/dhpollack/alphabet-game
+
 ## 🎯 About the Game
 
 The Alphabet Game is an interactive educational application where players:
