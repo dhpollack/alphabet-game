@@ -7,6 +7,15 @@ pub fn GameHeader() -> impl IntoView {
     let game_context = use_context::<GameContext>().expect("GameContext should be provided");
     let state = game_context.state;
     let game_context_clone = game_context.clone();
+    let (utterance_word, set_utterance_word) = signal("".to_string());
+    Effect::new(move |_| {
+        let word = utterance_word.get();
+        if let Ok(synth) = window().speech_synthesis()
+            && let Ok(utterance) = web_sys::SpeechSynthesisUtterance::new_with_text(&word)
+        {
+            synth.speak(&utterance);
+        }
+    });
 
     view! {
         <header class="bg-teal-700 text-white p-4 flex items-center justify-between">
@@ -28,7 +37,14 @@ pub fn GameHeader() -> impl IntoView {
                         <img src="/icons/backspace.svg" alt="Backspace" class="w-6 h-6" />
                     </button>
                     <div class="text-xl font-bold underline">
-                        {move || state.get().current_word}
+                        { move || {
+                            let word = state.get().current_word;
+                            let uword = utterance_word.get();
+                            if word != uword {
+                                set_utterance_word.set(word.clone());
+                            }
+                            word
+                        }}
                     </div>
                     <button
                         on:click=move |_| { game_context_clone.check_spelling(); }
