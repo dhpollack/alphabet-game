@@ -1,7 +1,7 @@
 [package]
 name = "alphabet-game"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
 authors = ["David Pollack <david@da3.net>"]
 
 [profile.release]
@@ -31,10 +31,6 @@ rand = { version = "0.9", default-features = false, features = [
 tower-service = "0.3"
 wasm-bindgen = "0.2"
 worker = { version = "0.6", features = ["http", "axum", "d1"], optional = true }
-web-sys = { version = "0.3.82", features = [
-  "SpeechSynthesis",
-  "SpeechSynthesisUtterance",
-] }
 
 [features]
 hydrate = ["leptos/hydrate"]

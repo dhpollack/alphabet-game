@@ -17,8 +17,15 @@ pub fn LetterGrid() -> impl IntoView {
                         view! {
                             <div class="grid grid-cols-3 landscape:grid-cols-4 h-full">
                                 {game_letters.into_iter().map(|letter| {
+                                    let game_context_clone = game_context.clone();
+                                    let letter_clone = letter.clone();
                                     view! {
-                                        <LetterButton letter=letter />
+                                        <LetterButton
+                                            letter=letter
+                                            on_click=move || {
+                                                game_context_clone.add_letter(&letter_clone);
+                                            }
+                                        />
                                     }
                                 }).collect_view()}
                             </div>

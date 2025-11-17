@@ -1,7 +1,6 @@
 use crate::database::get_languages;
 use crate::game::GameContext;
 use leptos::prelude::*;
-use web_sys::HtmlOptionElement;
 
 #[component]
 pub fn LanguageSelector() -> impl IntoView {
@@ -14,11 +13,9 @@ pub fn LanguageSelector() -> impl IntoView {
     // Handle language change
     let on_language_change = move |ev| {
         let value = event_target_value(&ev);
-        let option: HtmlOptionElement = event_target(&ev);
         if let Ok(language_id) = value.parse::<u32>() {
             // Only update current_language, let the effect in game.rs handle the rest
             game_context.current_language.set(language_id);
-            game_context.lang_code.set(option.label());
         }
     };
 
@@ -35,14 +32,14 @@ pub fn LanguageSelector() -> impl IntoView {
                             Some(Ok(languages)) => {
                                 languages.into_iter().map(|language| {
                                     view! {
-                                        <option value={language.id.to_string()} label={language.code.clone().to_string()}>
-                                            {language.code.clone()}
+                                        <option value={language.id.to_string()}>
+                                            {language.code}
                                         </option>
                                     }
                                 }).collect_view().into_any()
                             }
                             Some(Err(_)) => {
-                                view! { <option value="1">en</option> }.into_any()
+                                view! { <option value="1">US</option> }.into_any()
                             }
                             None => {
                                 view! { <option value="1">Loading...</option> }.into_any()
@@ -54,3 +51,4 @@ pub fn LanguageSelector() -> impl IntoView {
         </div>
     }
 }
+

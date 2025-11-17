@@ -8,7 +8,6 @@ use crate::game::GameContext;
 pub fn AlphabetGame() -> impl IntoView {
     let game_context = GameContext::new();
     provide_context(game_context.clone());
-    let (lang_code, set_lang_code) = signal("en".to_string());
 
     // Load initial word when component mounts
     Effect::new({
@@ -17,8 +16,6 @@ pub fn AlphabetGame() -> impl IntoView {
             let game_context = game_context.clone();
             leptos::task::spawn_local(async move {
                 let current_language = game_context.get_language_id();
-                let lc = game_context.lang_code.get();
-                set_lang_code.set(lc);
                 match get_letters_for_language(current_language).await {
                     Ok(letters_res) if !letters_res.is_empty() => {
                         let alphabet_letters: Vec<String> =
@@ -82,10 +79,6 @@ pub fn AlphabetGame() -> impl IntoView {
             if state.language_id != current_language {
                 let game_context = game_context.clone();
                 leptos::task::spawn_local(async move {
-                    // set lang_code
-                    let lc = game_context.lang_code.get();
-                    set_lang_code.set(lc);
-                    // set language_id
                     game_context.set_language_id(current_language);
                     match get_letters_for_language(current_language).await {
                         Ok(letters_res) if !letters_res.is_empty() => {
@@ -118,7 +111,7 @@ pub fn AlphabetGame() -> impl IntoView {
     });
 
     view! {
-        <div class="h-full flex flex-col" lang={move || lang_code.get()}>
+        <div class="h-full flex flex-col">
             <GameHeader />
             <LetterGrid />
         </div>

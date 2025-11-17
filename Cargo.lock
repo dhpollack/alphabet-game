@@ -32,7 +32,6 @@ dependencies = [
  "sqlx-d1",
  "tower-service",
  "wasm-bindgen",
- "web-sys",
  "worker",
 ]
 

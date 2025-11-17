@@ -6,7 +6,6 @@ use serde::{Deserialize, Serialize};
 
 const GAME_GRID_SIZE: usize = 12;
 const DEFAULT_LANGUAGE_ID: u32 = 1;
-const DEFAULT_LANG_CODE: &str = "en";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GameState {
@@ -118,15 +117,13 @@ impl GameState {
 pub struct GameContext {
     pub state: RwSignal<GameState>,
     pub current_language: RwSignal<u32>,
-    pub lang_code: RwSignal<String>,
 }
 
 impl Default for GameContext {
     fn default() -> Self {
         Self {
             state: RwSignal::new(GameState::default()),
-            current_language: RwSignal::new(DEFAULT_LANGUAGE_ID),
-            lang_code: RwSignal::new(DEFAULT_LANG_CODE.to_string()),
+            current_language: RwSignal::new(1), // Default language ID
         }
     }
 }
