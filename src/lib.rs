@@ -7,6 +7,7 @@ pub mod app;
 mod components;
 pub mod database;
 pub mod game;
+pub mod speech;
 
 #[cfg(feature = "ssr")]
 pub fn register_server_functions() {
