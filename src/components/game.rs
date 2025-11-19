@@ -79,6 +79,7 @@ pub fn AlphabetGame() -> impl IntoView {
             if state.language_id != current_language {
                 let game_context = game_context.clone();
                 leptos::task::spawn_local(async move {
+                    // set language_id
                     game_context.set_language_id(current_language);
                     match get_letters_for_language(current_language).await {
                         Ok(letters_res) if !letters_res.is_empty() => {
@@ -117,3 +118,4 @@ pub fn AlphabetGame() -> impl IntoView {
         </div>
     }
 }
+

@@ -2,7 +2,7 @@ help:
   just -l -u
 
 dev: sqlx-prepare
-  npx wrangler dev
+  npx wrangler dev --ip 0.0.0.0
 
 deploy: sqlx-prepare
   npx wrangler deploy
