@@ -32,7 +32,7 @@ pub fn AlphabetGame() -> impl IntoView {
                 };
                 match get_random_word_for_language(current_language).await {
                     Ok(Some(word)) => {
-                        game_context.reset_for_next_word(word.word);
+                        game_context.reset_for_next_word(word.first_word_no_spaces());
                     }
                     Ok(None) => {
                         leptos::logging::log!("No words found in database");
@@ -56,7 +56,7 @@ pub fn AlphabetGame() -> impl IntoView {
                 leptos::task::spawn_local(async move {
                     match get_random_word_for_language(state.language_id).await {
                         Ok(Some(word)) => {
-                            game_context.reset_for_next_word(word.word);
+                            game_context.reset_for_next_word(word.first_word_no_spaces());
                         }
                         Ok(None) => {
                             leptos::logging::log!("No more words found");
@@ -97,7 +97,7 @@ pub fn AlphabetGame() -> impl IntoView {
                     };
                     match get_random_word_for_language(current_language).await {
                         Ok(Some(word)) => {
-                            game_context.reset_for_next_word(word.word);
+                            game_context.reset_for_next_word(word.first_word_no_spaces());
                         }
                         Ok(None) => {
                             leptos::logging::log!("No words found in database");
@@ -118,4 +118,3 @@ pub fn AlphabetGame() -> impl IntoView {
         </div>
     }
 }
-

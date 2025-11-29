@@ -26,6 +26,17 @@ pub struct Word {
     pub language_id: u32,
 }
 
+impl Word {
+    pub fn first_word_no_spaces(&self) -> String {
+        self.word
+            .as_str()
+            .split_whitespace()
+            .next()
+            .map(|s| s.to_string())
+            .expect("word should always have non-empty characters")
+    }
+}
+
 #[server]
 pub async fn get_languages() -> Result<Vec<Language>, ServerFnError> {
     use axum::Extension;
@@ -98,14 +109,14 @@ pub async fn get_random_word_for_language(language_id: u32) -> Result<Option<Wor
     let d1 = env.d1("alphabet_game_stg")?;
     let conn = sqlx_d1::D1Connection::new(d1);
 
-    let word =
-        sqlx_d1::query_as!(Word,
+    let word = sqlx_d1::query_as!(
+        Word,
         "SELECT id, word, language_id FROM Words WHERE language_id = ? ORDER BY RANDOM() LIMIT 1",
         language_id
     )
-        .fetch_optional(&conn)
-        .await
-        .map_err(|e| worker::Error::RustError(e.to_string()))?;
+    .fetch_optional(&conn)
+    .await
+    .map_err(|e| worker::Error::RustError(e.to_string()))?;
 
     Ok(word)
 }
