@@ -23,14 +23,17 @@ leptos_axum = { version = "0.8", default-features = false, features = [
 leptos_meta = { version = "0.8" }
 leptos_router = { version = "0.8" }
 serde = { version = "1.0.228", features = ["derive"] }
-sqlx-d1 = { version = "0.2.1", features = ["macros", "query"] }
+sqlx-d1 = { git = "https://github.com/dhpollack/sqlx-d1.git", branch = "fix-update-worker-0_7", features = [
+  "macros",
+  "query",
+] }
 rand = { version = "0.9", default-features = false, features = [
   "std",
   "thread_rng",
 ] }
 tower-service = "0.3"
 wasm-bindgen = "0.2"
-worker = { version = "0.6", features = ["http", "axum", "d1"], optional = true }
+worker = { version = "0.7", features = ["http", "axum", "d1"], optional = true }
 web-sys = { version = "0.3.82", features = [
   "SpeechSynthesis",
   "SpeechSynthesisUtterance",
