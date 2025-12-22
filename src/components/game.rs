@@ -1,19 +1,50 @@
 use leptos::prelude::*;
+use leptos_router::{hooks::use_query, params::Params};
+use serde::{Deserialize, Serialize};
 
 use crate::components::{header::GameHeader, letter_grid::LetterGrid};
 use crate::database::{
-    Language, get_default_language, get_letters_for_language, get_random_word_for_language,
+    Language, get_default_language, get_languages, get_letters_for_language,
+    get_random_word_for_language,
 };
 use crate::game::GameContext;
+
+#[derive(Params, PartialEq, Clone, Serialize, Deserialize)]
+struct QueryParams {
+    lang: Option<String>,
+}
 
 #[component]
 pub fn AlphabetGame() -> impl IntoView {
     let default_language_resource = OnceResource::new(get_default_language());
+    let languages_resource = OnceResource::new(get_languages());
+    let query = use_query::<QueryParams>();
     view! {
-        <Suspense fallback=|| view! { "Loading..." }>
+        <Suspense fallback=|| {
+            view! { "Loading..." }
+        }>
             {move || {
-                if let Some(Ok(default_lang)) = default_language_resource.get() {
-                    view! { <GameContent default_language=default_lang /> }.into_any()
+                let start_language = match (
+                    query.get(),
+                    languages_resource.get(),
+                    default_language_resource.get(),
+                ) {
+                    (Ok(query_params), _, Some(Ok(default_lang))) if query_params.lang.is_none() => {
+                        Some(default_lang)
+                    }
+                    (Ok(query_params), Some(Ok(languages)), Some(Ok(default_lang))) => {
+                        let found_lang = query_params
+                            .lang
+                            .and_then(|lang_code| {
+                                languages.iter().find(|l| l.code == *lang_code).cloned()
+                            })
+                            .unwrap_or(default_lang);
+                        Some(found_lang)
+                    }
+                    _ => None,
+                };
+                if let Some(lang) = start_language {
+                    view! { <GameContent default_language=lang /> }.into_any()
                 } else {
                     view! { "Error!" }.into_any()
                 }

@@ -24,7 +24,9 @@ pub fn GameHeader() -> impl IntoView {
             <div class="flex flex-col items-center">
                 <div class="flex items-center space-x-3">
                     <button
-                        on:click=move |_| { game_context_backspace.remove_last_letter(); }
+                        on:click=move |_| {
+                            game_context_backspace.remove_last_letter();
+                        }
                         class="bg-red-500 text-white p-1 rounded hover:bg-red-600 active:bg-red-700 transition-colors"
                     >
                         <img src="/icons/backspace.svg" alt="Backspace" class="w-6 h-6" />
@@ -32,7 +34,7 @@ pub fn GameHeader() -> impl IntoView {
                     <button
                         on:click=move |_| {
                             let word = game_context.get_current_word();
-                            if !word.is_empty()  {
+                            if !word.is_empty() {
                                 let lang = game_context_check.current_language.get();
                                 speak(&word, &lang.code);
                             }
@@ -44,7 +46,7 @@ pub fn GameHeader() -> impl IntoView {
                     <button
                         on:click=move |_| {
                             let word = state.get().user_input.word;
-                            if !word.is_empty()  {
+                            if !word.is_empty() {
                                 let lang = game_context_check.current_language.get();
                                 speak(&word, &lang.code);
                             }
@@ -55,9 +57,7 @@ pub fn GameHeader() -> impl IntoView {
                         <img src="/icons/check.svg" alt="Check" class="w-6 h-6" />
                     </button>
                 </div>
-                <div class="text-lg mt-1 min-h-6">
-                    {move || state.get().user_input.word}
-                </div>
+                <div class="text-lg mt-1 min-h-6">{move || state.get().user_input.word}</div>
             </div>
 
             // Right Section: Menu, Control Buttons, and Alphabet

@@ -45,20 +45,23 @@ pub fn LanguageSelector() -> impl IntoView {
                     {move || {
                         match languages_resource.get() {
                             Some(Ok(languages)) => {
-                                languages.into_iter().map(|language| {
-                                    view! {
-                                        <option value={language.id.to_string()} label={language.code.clone().to_string()}>
-                                            {language.code.clone()}
-                                        </option>
-                                    }
-                                }).collect_view().into_any()
+                                languages
+                                    .into_iter()
+                                    .map(|language| {
+                                        view! {
+                                            <option
+                                                value=language.id.to_string()
+                                                label=language.code.clone().to_string()
+                                            >
+                                                {language.code.clone()}
+                                            </option>
+                                        }
+                                    })
+                                    .collect_view()
+                                    .into_any()
                             }
-                            Some(Err(_)) => {
-                                view! { <option value="1">en</option> }.into_any()
-                            }
-                            None => {
-                                view! { <option value="1">Loading...</option> }.into_any()
-                            }
+                            Some(Err(_)) => view! { <option value="1">en</option> }.into_any(),
+                            None => view! { <option value="1">Loading...</option> }.into_any(),
                         }
                     }}
                 </select>
