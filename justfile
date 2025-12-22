@@ -1,6 +1,9 @@
 help:
   just -l -u
 
+format:
+  leptosfmt src/
+
 dev: sqlx-prepare
   npx wrangler dev --ip 0.0.0.0
 
