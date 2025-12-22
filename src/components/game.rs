@@ -27,6 +27,17 @@ pub fn GameContent(default_language: Language) -> impl IntoView {
     let game_context = GameContext::new(default_language);
     provide_context(game_context.clone());
 
+    async fn next_word(ctx: &GameContext, lang: Language) {
+        match get_random_word_for_language(lang.clone()).await {
+            Ok(word) => {
+                ctx.reset_for_next_word(word);
+            }
+            Err(e) => {
+                leptos::logging::log!("Error loading word: {:?}", e);
+            }
+        };
+    }
+
     // Load initial word when component mounts
     Effect::new({
         let game_context = game_context.clone();
@@ -49,43 +60,8 @@ pub fn GameContent(default_language: Language) -> impl IntoView {
                         leptos::logging::log!("No letters found for this language: {:?}", e);
                     }
                 };
-                match get_random_word_for_language(current_language).await {
-                    Ok(Some(word)) => {
-                        game_context.reset_for_next_word(word.first_word_no_spaces());
-                    }
-                    Ok(None) => {
-                        leptos::logging::log!("No words found in database");
-                    }
-                    Err(e) => {
-                        leptos::logging::log!("Error loading word: {:?}", e);
-                    }
-                };
+                next_word(&game_context, current_language).await;
             });
-        }
-    });
-
-    // Handle word progression when current word is completed
-    Effect::new({
-        let game_context = game_context.clone();
-        move || {
-            let state = game_context.state.get();
-            if state.is_completed {
-                let game_context = game_context.clone();
-                // Wait a moment, then load next word
-                leptos::task::spawn_local(async move {
-                    match get_random_word_for_language(state.language).await {
-                        Ok(Some(word)) => {
-                            game_context.reset_for_next_word(word.first_word_no_spaces());
-                        }
-                        Ok(None) => {
-                            leptos::logging::log!("No more words found");
-                        }
-                        Err(e) => {
-                            leptos::logging::log!("Error loading next word: {:?}", e);
-                        }
-                    }
-                });
-            }
         }
     });
 
@@ -99,7 +75,7 @@ pub fn GameContent(default_language: Language) -> impl IntoView {
                 let game_context = game_context.clone();
                 leptos::task::spawn_local(async move {
                     // set language_id
-                    game_context.set_language(&current_language);
+                    game_context.set_language(&current_language.clone());
                     match get_letters_for_language(current_language.clone()).await {
                         Ok(letters_res) if !letters_res.is_empty() => {
                             let alphabet_letters: Vec<String> =
@@ -115,17 +91,22 @@ pub fn GameContent(default_language: Language) -> impl IntoView {
                             leptos::logging::log!("No letters found for this language: {:?}", e);
                         }
                     };
-                    match get_random_word_for_language(current_language).await {
-                        Ok(Some(word)) => {
-                            game_context.reset_for_next_word(word.first_word_no_spaces());
-                        }
-                        Ok(None) => {
-                            leptos::logging::log!("No words found in database");
-                        }
-                        Err(e) => {
-                            leptos::logging::log!("Error loading word: {:?}", e);
-                        }
-                    };
+                    next_word(&game_context, state.language).await;
+                });
+            }
+        }
+    });
+
+    // Handle word progression when current word is completed
+    Effect::new({
+        let game_context = game_context.clone();
+        move || {
+            let state = game_context.state.get();
+            if state.is_completed {
+                let game_context = game_context.clone();
+                // Wait a moment, then load next word
+                leptos::task::spawn_local(async move {
+                    next_word(&game_context, state.language).await;
                 });
             }
         }

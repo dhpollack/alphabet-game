@@ -1,7 +1,10 @@
+use std::collections::HashSet;
+
 use leptos::prelude::*;
 use serde::{Deserialize, Serialize};
 
-pub const DEFAULT_LANGUAGE_ID: u32 = 1;
+#[cfg(feature = "ssr")]
+const DEFAULT_LANGUAGE_ID: u32 = 1;
 
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx_d1::FromRow)]
 pub struct Language {
@@ -22,7 +25,7 @@ pub struct Letter {
     pub name_en: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, sqlx_d1::FromRow)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, sqlx_d1::FromRow)]
 pub struct Word {
     pub id: u32,
     pub word: String,
@@ -30,13 +33,52 @@ pub struct Word {
 }
 
 impl Word {
-    pub fn first_word_no_spaces(&self) -> String {
-        self.word
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    // Create single word and remove diacritics after loading from database
+    pub fn post_process(&self, lang: &Language) -> String {
+        let word = self
+            .word
             .as_str()
             .split_whitespace()
             .next()
             .map(|s| s.to_string())
-            .expect("word should always have non-empty characters")
+            .expect("word should always have non-empty characters");
+        match (lang.code.as_str(), lang.strip_diacritics) {
+            ("ar", true) => tashkil::remove(&word).to_string(),
+            _ => word,
+        }
+    }
+
+    // Create HashSet of letters to seed the grid before adding distractor letters
+    pub fn letters_for_grid(&self) -> HashSet<String> {
+        let letters = decompose(self.word.clone());
+        letters.into_iter().map(|c| c.to_string()).collect()
+    }
+
+    pub fn len(&self) -> usize {
+        let letters = decompose(self.word.clone());
+        letters.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+}
+
+pub fn decompose(word: String) -> Vec<char> {
+    match word.chars().next() {
+        Some(c) if rustkorean::check_korean(c) => hangeul::decompose(&word)
+            .into_iter()
+            .flat_map(|block| match block {
+                Ok((first, second, Some(third))) => vec![first, second, third],
+                Ok((first, second, None)) => vec![first, second],
+                _ => vec![],
+            })
+            .collect(),
+        _ => word.chars().collect(),
     }
 }
 
@@ -105,9 +147,7 @@ pub async fn get_words_for_language(language: Language) -> Result<Vec<Word>, Ser
 }
 
 #[server]
-pub async fn get_random_word_for_language(
-    language: Language,
-) -> Result<Option<Word>, ServerFnError> {
+pub async fn get_random_word_for_language(language: Language) -> Result<Word, ServerFnError> {
     use axum::Extension;
     use std::sync::Arc;
     use worker::Env;
@@ -118,11 +158,15 @@ pub async fn get_random_word_for_language(
 
     let word = sqlx_d1::query_as!(
         Word,
-        "SELECT id, word, language_id FROM Words WHERE language_id = ? ORDER BY RANDOM() LIMIT 1",
+        "SELECT id, word, language_id FROM Words WHERE language_id = ? ORDER BY RANDOM()",
         language.id
     )
-    .fetch_optional(&conn)
+    .fetch_one(&conn)
     .await
+    .map(|mut word| {
+        word.word = word.post_process(&language);
+        word
+    })
     .map_err(|e| worker::Error::RustError(e.to_string()))?;
 
     Ok(word)
@@ -138,7 +182,6 @@ pub async fn get_default_language() -> Result<Language, ServerFnError> {
     let d1 = env.d1("alphabet_game_stg")?;
     let conn = sqlx_d1::D1Connection::new(d1);
 
-    leptos::logging::log!("get_default_language");
     match sqlx_d1::query_as!(
         Language,
         "SELECT id, name, name_other, code, strip_diacritics FROM Languages WHERE id = ?",
