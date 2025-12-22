@@ -91,7 +91,7 @@ pub fn GameContent(default_language: Language) -> impl IntoView {
                             leptos::logging::log!("No letters found for this language: {:?}", e);
                         }
                     };
-                    next_word(&game_context, state.language).await;
+                    next_word(&game_context, current_language).await;
                 });
             }
         }
