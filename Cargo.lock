@@ -23,13 +23,16 @@ version = "0.1.0"
 dependencies = [
  "axum",
  "getrandom",
+ "hangeul",
  "leptos",
  "leptos_axum",
  "leptos_meta",
  "leptos_router",
  "rand",
+ "rustkorean",
  "serde",
  "sqlx-d1",
+ "tashkil",
  "tower-service",
  "wasm-bindgen",
  "web-sys",
@@ -716,6 +719,12 @@ name = "guardian"
 version = "1.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "17e2ac29387b1aa07a1e448f7bb4f35b500787971e965b02842b900afa5c8f6f"
+
+[[package]]
+name = "hangeul"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2723ce10e5f74e0d590070ccf5a28655f91ad8d69e914b869d3fb17162cde857"
 
 [[package]]
 name = "hashbrown"
@@ -1748,6 +1757,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "rustkorean"
+version = "1.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "63b7d3bcbcab8b25f9bbeccc3f50a314bfb5f6325717b70daeb85fd9f1c40dce"
+
+[[package]]
 name = "rustversion"
 version = "1.0.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2183,6 +2198,12 @@ dependencies = [
  "wasm-bindgen",
  "web-sys",
 ]
+
+[[package]]
+name = "tashkil"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "924350c2a6af604d42353b502765657c0bdcb48d93939345192953bc5a620c7b"
 
 [[package]]
 name = "tempfile"

@@ -12,14 +12,14 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
         <!DOCTYPE html>
         <html lang="en">
             <head>
-                <meta charset="utf-8"/>
-                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <meta charset="utf-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <AutoReload options=options.clone() />
-                <HydrationScripts options/>
-                <MetaTags/>
+                <HydrationScripts options />
+                <MetaTags />
             </head>
             <body>
-                <App/>
+                <App />
             </body>
         </html>
     }
@@ -33,13 +33,13 @@ pub fn App() -> impl IntoView {
     view! {
         // injects a stylesheet into the document <head>
         // id=leptos means cargo-leptos will hot-reload this stylesheet
-        <Stylesheet id="leptos" href="/pkg/alphabet-game.css"/>
+        <Stylesheet id="leptos" href="/pkg/alphabet-game.css" />
 
         // content for this welcome page
         <Router>
             <main>
                 <Routes fallback=|| "Page not found.".into_view()>
-                    <Route path=path!("/") view=HomePage/>
+                    <Route path=path!("/") view=HomePage />
                 </Routes>
             </main>
         </Router>
@@ -49,7 +49,5 @@ pub fn App() -> impl IntoView {
 /// Renders the home page of your application.
 #[component]
 fn HomePage() -> impl IntoView {
-    view! {
-        <AlphabetGame />
-    }
+    view! { <AlphabetGame /> }
 }

@@ -1,64 +1,101 @@
-use std::collections::HashSet;
-
 use leptos::prelude::*;
 use rand::seq::SliceRandom;
 use serde::{Deserialize, Serialize};
 
+use crate::database::{Language, Word};
+
 const GAME_GRID_SIZE: usize = 12;
-const DEFAULT_LANGUAGE_ID: u32 = 1;
-const DEFAULT_LANG_CODE: &str = "en";
+
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
+pub struct UserInput {
+    pub word: String,
+    pub parts: Vec<char>,
+}
+
+impl PartialEq<Word> for UserInput {
+    fn eq(&self, other: &Word) -> bool {
+        self.word == other.word
+    }
+}
+
+impl UserInput {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn add_letter(&mut self, letter: &str) {
+        for c in letter.chars() {
+            self.parts.push(c);
+        }
+        if let Some(first_char) = self.word.chars().next()
+            && rustkorean::check_korean(first_char)
+        {
+            self.word = rustkorean::compose_korean(self.parts.clone());
+        } else {
+            self.word = self.parts.iter().collect();
+        }
+    }
+
+    pub fn remove_last_letter(&mut self) {
+        if let Some(last_letter) = self.parts.pop()
+            && rustkorean::check_korean(last_letter)
+        {
+            self.word = rustkorean::compose_korean(self.parts.clone());
+        } else {
+            self.word = self.parts.iter().collect();
+        };
+    }
+
+    pub fn len(&self) -> usize {
+        self.parts.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.parts.is_empty()
+    }
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GameState {
-    pub current_word: String,
-    pub user_input: String,
+    pub current_word: Word,
+    pub user_input: UserInput,
     pub score: i32,
     pub attempts: i32,
     pub max_attempts: i32,
     pub current_attempt: i32,
     pub is_completed: bool,
-    pub language_id: u32,
+    pub language: Language,
     pub language_letters: Vec<String>,
     pub game_letters: Vec<String>,
     pub game_grid_size: usize,
 }
 
-impl Default for GameState {
-    fn default() -> Self {
+impl GameState {
+    pub fn new(language: Language) -> Self {
         Self {
-            current_word: String::new(),
-            user_input: String::new(),
+            language,
+            current_word: Word::new(),
+            user_input: UserInput::new(),
             score: 0,
             attempts: 0,
             max_attempts: 5,
             current_attempt: 1,
             is_completed: false,
-            language_id: DEFAULT_LANGUAGE_ID, // Default language ID
             language_letters: vec![],
             game_letters: vec![],
             game_grid_size: GAME_GRID_SIZE,
         }
     }
-}
-
-impl GameState {
-    pub fn new(language_id: u32) -> Self {
-        Self {
-            language_id,
-            ..Default::default()
-        }
-    }
 
     pub fn add_letter(&mut self, letter: &str) {
-        if self.user_input.chars().count() < self.current_word.chars().count() {
-            self.user_input.push_str(letter);
+        leptos::logging::log!("original current_word: {}", self.current_word.word);
+        if self.user_input.len() < self.current_word.len() {
+            self.user_input.add_letter(letter);
         }
     }
 
     pub fn remove_last_letter(&mut self) {
-        if let Some(last_char_boundary) = self.user_input.char_indices().last() {
-            self.user_input.truncate(last_char_boundary.0);
-        }
+        self.user_input.remove_last_letter();
     }
 
     pub fn check_spelling(&mut self) -> bool {
@@ -67,7 +104,7 @@ impl GameState {
 
         if is_correct {
             // Calculate points: 1 point per character + bonus for first try
-            let base_points = self.current_word.chars().count() as i32;
+            let base_points = self.current_word.len() as i32;
             let bonus_points = if self.attempts == 1 {
                 10
             } else {
@@ -82,10 +119,10 @@ impl GameState {
         is_correct
     }
 
-    pub fn reset_for_next_word(&mut self, next_word: String) {
+    pub fn reset_for_next_word(&mut self, next_word: Word) {
         let alphabet_letters = self.language_letters.clone();
         let grid_size = self.game_grid_size;
-        let mut grid_letters: HashSet<String> = next_word.chars().map(|c| c.to_string()).collect();
+        let mut grid_letters = next_word.letters_for_grid();
         let mut rng = rand::rng();
         let mut distractor_letters: Vec<String> = alphabet_letters
             .into_iter()
@@ -98,7 +135,7 @@ impl GameState {
         final_grid.shuffle(&mut rng);
 
         self.current_word = next_word;
-        self.user_input.clear();
+        self.user_input = UserInput::new();
         self.attempts = 0;
         self.current_attempt = 1;
         self.is_completed = false;
@@ -117,23 +154,15 @@ impl GameState {
 #[derive(Debug, Clone)]
 pub struct GameContext {
     pub state: RwSignal<GameState>,
-    pub current_language: RwSignal<u32>,
-    pub lang_code: RwSignal<String>,
-}
-
-impl Default for GameContext {
-    fn default() -> Self {
-        Self {
-            state: RwSignal::new(GameState::default()),
-            current_language: RwSignal::new(DEFAULT_LANGUAGE_ID),
-            lang_code: RwSignal::new(DEFAULT_LANG_CODE.to_string()),
-        }
-    }
+    pub current_language: RwSignal<Language>,
 }
 
 impl GameContext {
-    pub fn new() -> Self {
-        Self::default()
+    pub fn new(language: Language) -> Self {
+        Self {
+            state: RwSignal::new(GameState::new(language.clone())),
+            current_language: RwSignal::new(language),
+        }
     }
 
     pub fn add_letter(&self, letter: &str) {
@@ -156,14 +185,14 @@ impl GameContext {
         result
     }
 
-    pub fn set_language_id(&self, language_id: u32) {
+    pub fn set_language(&self, language: &Language) {
         self.state.update(|state| {
-            state.language_id = language_id;
+            state.language = language.clone();
         });
-        self.current_language.set(language_id);
+        self.current_language.set(language.clone());
     }
 
-    pub fn reset_for_next_word(&self, next_word: String) {
+    pub fn reset_for_next_word(&self, next_word: Word) {
         self.state.update(|state| {
             state.reset_for_next_word(next_word);
         });
@@ -176,10 +205,10 @@ impl GameContext {
     }
 
     pub fn get_current_word(&self) -> String {
-        self.state.get().current_word.clone()
+        self.state.get().current_word.word.clone()
     }
 
-    pub fn get_language_id(&self) -> u32 {
-        self.state.get().language_id
+    pub fn get_language(&self) -> Language {
+        self.state.get().language
     }
 }
