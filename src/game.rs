@@ -4,9 +4,9 @@ use leptos::prelude::*;
 use rand::seq::SliceRandom;
 use serde::{Deserialize, Serialize};
 
+use crate::database::Language;
+
 const GAME_GRID_SIZE: usize = 12;
-const DEFAULT_LANGUAGE_ID: u32 = 1;
-const DEFAULT_LANG_CODE: &str = "en";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GameState {
@@ -17,15 +17,16 @@ pub struct GameState {
     pub max_attempts: i32,
     pub current_attempt: i32,
     pub is_completed: bool,
-    pub language_id: u32,
+    pub language: Language,
     pub language_letters: Vec<String>,
     pub game_letters: Vec<String>,
     pub game_grid_size: usize,
 }
 
-impl Default for GameState {
-    fn default() -> Self {
+impl GameState {
+    pub fn new(language: Language) -> Self {
         Self {
+            language,
             current_word: String::new(),
             user_input: String::new(),
             score: 0,
@@ -33,19 +34,9 @@ impl Default for GameState {
             max_attempts: 5,
             current_attempt: 1,
             is_completed: false,
-            language_id: DEFAULT_LANGUAGE_ID, // Default language ID
             language_letters: vec![],
             game_letters: vec![],
             game_grid_size: GAME_GRID_SIZE,
-        }
-    }
-}
-
-impl GameState {
-    pub fn new(language_id: u32) -> Self {
-        Self {
-            language_id,
-            ..Default::default()
         }
     }
 
@@ -117,23 +108,15 @@ impl GameState {
 #[derive(Debug, Clone)]
 pub struct GameContext {
     pub state: RwSignal<GameState>,
-    pub current_language: RwSignal<u32>,
-    pub lang_code: RwSignal<String>,
-}
-
-impl Default for GameContext {
-    fn default() -> Self {
-        Self {
-            state: RwSignal::new(GameState::default()),
-            current_language: RwSignal::new(DEFAULT_LANGUAGE_ID),
-            lang_code: RwSignal::new(DEFAULT_LANG_CODE.to_string()),
-        }
-    }
+    pub current_language: RwSignal<Language>,
 }
 
 impl GameContext {
-    pub fn new() -> Self {
-        Self::default()
+    pub fn new(language: Language) -> Self {
+        Self {
+            state: RwSignal::new(GameState::new(language.clone())),
+            current_language: RwSignal::new(language),
+        }
     }
 
     pub fn add_letter(&self, letter: &str) {
@@ -156,11 +139,11 @@ impl GameContext {
         result
     }
 
-    pub fn set_language_id(&self, language_id: u32) {
+    pub fn set_language(&self, language: &Language) {
         self.state.update(|state| {
-            state.language_id = language_id;
+            state.language = language.clone();
         });
-        self.current_language.set(language_id);
+        self.current_language.set(language.clone());
     }
 
     pub fn reset_for_next_word(&self, next_word: String) {
@@ -179,7 +162,7 @@ impl GameContext {
         self.state.get().current_word.clone()
     }
 
-    pub fn get_language_id(&self) -> u32 {
-        self.state.get().language_id
+    pub fn get_language(&self) -> Language {
+        self.state.get().language
     }
 }

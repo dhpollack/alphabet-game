@@ -32,9 +32,9 @@ pub fn GameHeader() -> impl IntoView {
                     <button
                         on:click=move |_| {
                             let word = game_context.get_current_word();
-                            if !word.is_empty() {
-                                let lang = game_context.lang_code.get();
-                                speak(&word, &lang);
+                            if !word.is_empty()  {
+                                let lang = game_context_check.current_language.get();
+                                speak(&word, &lang.code);
                             }
                         }
                         class="bg-transparent border-none p-0 m-0 text-xl font-bold underline cursor-pointer"
@@ -44,9 +44,9 @@ pub fn GameHeader() -> impl IntoView {
                     <button
                         on:click=move |_| {
                             let word = state.get().user_input;
-                            if !word.is_empty() {
-                                let lang = game_context_check.lang_code.get();
-                                speak(&word, &lang);
+                            if !word.is_empty()  {
+                                let lang = game_context_check.current_language.get();
+                                speak(&word, &lang.code);
                             }
                             game_context_check.check_spelling();
                         }

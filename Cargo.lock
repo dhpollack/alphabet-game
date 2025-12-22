@@ -30,6 +30,7 @@ dependencies = [
  "rand",
  "serde",
  "sqlx-d1",
+ "tashkil",
  "tower-service",
  "wasm-bindgen",
  "web-sys",
@@ -2183,6 +2184,12 @@ dependencies = [
  "wasm-bindgen",
  "web-sys",
 ]
+
+[[package]]
+name = "tashkil"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "924350c2a6af604d42353b502765657c0bdcb48d93939345192953bc5a620c7b"
 
 [[package]]
 name = "tempfile"
