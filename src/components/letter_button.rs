@@ -11,8 +11,8 @@ pub fn LetterButton(letter: String) -> impl IntoView {
         <button
             on:click=move |_| {
                 game_context.add_letter(&letter_clone);
-                let lang = game_context.lang_code.get();
-                speak(&letter_clone, &lang);
+                let lang = game_context.current_language.get();
+                speak(&letter_clone, &lang.code);
             }
             class="bg-transparent text-black text-[8vw] font-bold w-full h-full hover:bg-black/10 active:bg-gray-200 transition-colors flex items-center justify-center"
         >
