@@ -4,6 +4,9 @@ help:
 format:
   leptosfmt src/
 
+build:
+  cargo leptos build --release
+
 dev: sqlx-prepare
   npx wrangler dev --ip 0.0.0.0
 
