@@ -22,11 +22,11 @@ leptos_axum = { version = "0.8", default-features = false, features = [
 leptos_meta = { version = "0.8" }
 leptos_router = { version = "0.8" }
 serde = { version = "1.0.228", features = ["derive"] }
-# sqlx-d1 = { version = "0.3.1", features = ["macros", "query"] }
-sqlx-d1 = { git = "https://github.com/dhpollack/sqlx-d1", branch = "feat-update-worker-rs", features = [
-  "macros",
-  "query",
-] }
+sqlx-d1 = { version = "0.4", features = ["macros", "query"] }
+#sqlx-d1 = { git = "https://github.com/dhpollack/sqlx-d1", branch = "feat-update-worker-rs", features = [
+#  "macros",
+#  "query",
+#] }
 rand = { version = "0.10", default-features = false, features = [
   "std",
   "thread_rng",

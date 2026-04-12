@@ -2089,7 +2089,8 @@ dependencies = [
 [[package]]
 name = "sqlx-d1"
 version = "0.4.0"
-source = "git+https://github.com/dhpollack/sqlx-d1?branch=feat-update-worker-rs#39973747d26170f62b6062ea53ad8e755cdc8e70"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9b8eb15f0f9a8eaf54012e653042b61eb1ad8a8f371e0689e09fad90b7248ccb"
 dependencies = [
  "sqlx-d1-core",
  "sqlx-d1-macros",
@@ -2098,7 +2099,8 @@ dependencies = [
 [[package]]
 name = "sqlx-d1-core"
 version = "0.4.0"
-source = "git+https://github.com/dhpollack/sqlx-d1?branch=feat-update-worker-rs#39973747d26170f62b6062ea53ad8e755cdc8e70"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c893032bfc9b3b6dc9ada576e3fde4a16271a400a2b6f2ab2f69a3e871ba0580"
 dependencies = [
  "futures-core",
  "futures-util",
@@ -2113,7 +2115,8 @@ dependencies = [
 [[package]]
 name = "sqlx-d1-macros"
 version = "0.4.0"
-source = "git+https://github.com/dhpollack/sqlx-d1?branch=feat-update-worker-rs#39973747d26170f62b6062ea53ad8e755cdc8e70"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1b5794aaac24426e7f00bb63e87aadc4d7576dddd870afb5c7ae6618edc73fdb"
 dependencies = [
  "futures-lite",
  "heck",
