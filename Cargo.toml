@@ -15,7 +15,6 @@ crate-type = ["cdylib"]
 
 [dependencies]
 axum = { version = "0.8", default-features = false, optional = true }
-getrandom = { version = "0.3", features = ["wasm_js"] }
 leptos = { version = "0.8" }
 leptos_axum = { version = "0.8", default-features = false, features = [
   "wasm",
@@ -23,14 +22,18 @@ leptos_axum = { version = "0.8", default-features = false, features = [
 leptos_meta = { version = "0.8" }
 leptos_router = { version = "0.8" }
 serde = { version = "1.0.228", features = ["derive"] }
-sqlx-d1 = { version = "0.3.1", features = ["macros", "query"] }
-rand = { version = "0.9", default-features = false, features = [
+sqlx-d1 = { version = "0.4", features = ["macros", "query"] }
+#sqlx-d1 = { git = "https://github.com/dhpollack/sqlx-d1", branch = "feat-update-worker-rs", features = [
+#  "macros",
+#  "query",
+#] }
+rand = { version = "0.10", default-features = false, features = [
   "std",
   "thread_rng",
 ] }
 tower-service = "0.3"
 wasm-bindgen = "0.2.106"
-worker = { version = "0.7", features = ["http", "axum", "d1"], optional = true }
+worker = { version = "0.8", features = ["http", "axum", "d1"], optional = true }
 web-sys = { version = "0.3.82", features = [
   "SpeechSynthesis",
   "SpeechSynthesisUtterance",
@@ -38,6 +41,9 @@ web-sys = { version = "0.3.82", features = [
 tashkil = "0.1.0"
 hangeul = "0.4.0"
 rustkorean = "1.1.2"
+# hack to force subdeps to use wasm_js feature, use cargo tree to check
+getrandom = { version = "0.4", features = ["wasm_js"] }
+getrandom03 = { package = "getrandom", version = "0.3", features = ["wasm_js"] }
 
 [features]
 hydrate = ["leptos/hydrate"]
